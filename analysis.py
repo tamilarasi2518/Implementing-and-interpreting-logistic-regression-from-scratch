@@ -1,39 +1,26 @@
-import numpy as np
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, precision_score, recall_score
 
+import numpy as np
 from logistic_regression import LogisticRegressionScratch
 
-data = load_breast_cancer()
-X, y = data.data, data.target
+# Load synthetic dataset from main logic
+np.random.seed(42)
+n_samples = 500
+income = np.random.normal(50000, 15000, n_samples)
+debt = np.random.normal(15000, 5000, n_samples)
+credit_score = np.random.normal(650, 50, n_samples)
 
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
+X = np.column_stack([income, debt, credit_score])
+y = ((0.00004*debt - 0.00003*income - 0.002*credit_score + np.random.normal(0,0.05,n_samples)) > -0.5).astype(int)
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+X = (X - X.mean(axis=0)) / X.std(axis=0)
 
-model = LogisticRegressionScratch(lr=0.01, n_iters=5000)
-model.fit(X_train, y_train)
-y_pred = model.predict(X_test)
+model = LogisticRegressionScratch(lr=0.01, n_iters=8000)
+model.fit(X, y)
 
-acc = accuracy_score(y_test, y_pred)
-prec = precision_score(y_test, y_pred)
-rec = recall_score(y_test, y_pred)
+print("Final weights:", model.weights)
+print("Final bias:", model.bias)
 
-print("Custom Logistic Regression:")
-print("Accuracy:", acc)
-print("Precision:", prec)
-print("Recall:", rec)
-print("Coefficients:", model.weights)
-
-sk = LogisticRegression(max_iter=5000)
-sk.fit(X_train, y_train)
-y_pred_sk = sk.predict(X_test)
-
-print("\nScikit-learn Logistic Regression:")
-print("Accuracy:", accuracy_score(y_test, y_pred_sk))
-print("Precision:", precision_score(y_test, y_pred_sk))
-print("Recall:", recall_score(y_test, recall_score(y_test, y_pred_sk)))
+# Interpretation
+features = ["income", "debt", "credit_score"]
+for f, w in zip(features, model.weights):
+    print(f"Feature: {f}, Weight: {w}, Interpretation: {'positive' if w>0 else 'negative'} influence on default probability")

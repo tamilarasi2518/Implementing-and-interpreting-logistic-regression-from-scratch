@@ -1,24 +1,37 @@
+
 import numpy as np
 
 class LogisticRegressionScratch:
-    def __init__(self, lr=0.01, n_iter=3000):
+    def __init__(self, lr=0.01, n_iters=1000):
         self.lr = lr
-        self.n_iter = n_iter
+        self.n_iters = n_iters
+        self.weights = None
+        self.bias = None
 
-    def _sigmoid(self, z):
-        return 1/(1+np.exp(-z))
+    def sigmoid(self, z):
+        return 1 / (1 + np.exp(-z))
+
+    def binary_cross_entropy(self, y_true, y_pred):
+        eps = 1e-9
+        return -np.mean(y_true*np.log(y_pred+eps) + (1-y_true)*np.log(1-y_pred+eps))
 
     def fit(self, X, y):
-        X=np.c_[np.ones((X.shape[0],1)),X]
-        self.theta=np.zeros(X.shape[1])
-        for _ in range(self.n_iter):
-            preds=self._sigmoid(X@self.theta)
-            grad=X.T@(preds-y)/len(y)
-            self.theta-=self.lr*grad
+        n_samples, n_features = X.shape
+        self.weights = np.zeros(n_features)
+        self.bias = 0
 
-    def predict(self,X):
-        X=np.c_[np.ones((X.shape[0],1)),X]
-        return (self._sigmoid(X@self.theta)>=0.5).astype(int)
+        for _ in range(self.n_iters):
+            linear = np.dot(X, self.weights) + self.bias
+            y_pred = self.sigmoid(linear)
 
-    def coefficients(self, feature_names):
-        return {name: w for name,w in zip(["bias"]+feature_names, self.theta)}
+            dw = (1/n_samples) * np.dot(X.T, (y_pred - y))
+            db = (1/n_samples) * np.sum(y_pred - y)
+
+            self.weights -= self.lr * dw
+            self.bias -= self.lr * db
+
+    def predict_prob(self, X):
+        return self.sigmoid(np.dot(X, self.weights) + self.bias)
+
+    def predict(self, X):
+        return (self.predict_prob(X) >= 0.5).astype(int)

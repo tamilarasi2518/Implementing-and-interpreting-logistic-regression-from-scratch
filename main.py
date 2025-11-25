@@ -1,16 +1,23 @@
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+
+import numpy as np
 from logistic_regression import LogisticRegressionScratch
 
-X,y=make_classification(n_samples=1000,n_features=5,n_informative=3,random_state=42)
-feature_names=[f"feature_{i}" for i in range(X.shape[1])]
+np.random.seed(42)
 
-X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42)
+# Generate synthetic loan-default-like dataset
+n_samples = 500
+income = np.random.normal(50000, 15000, n_samples)
+debt = np.random.normal(15000, 5000, n_samples)
+credit_score = np.random.normal(650, 50, n_samples)
 
-model=LogisticRegressionScratch()
-model.fit(X_train,y_train)
+X = np.column_stack([income, debt, credit_score])
+y = ((0.00004*debt - 0.00003*income - 0.002*credit_score + np.random.normal(0,0.05,n_samples)) > -0.5).astype(int)
 
-preds=model.predict(X_test)
-print("Accuracy:",accuracy_score(y_test,preds))
-print("Coefficients:",model.coefficients(feature_names))
+# Normalize manually (no sklearn)
+X = (X - X.mean(axis=0)) / X.std(axis=0)
+
+model = LogisticRegressionScratch(lr=0.01, n_iters=8000)
+model.fit(X, y)
+
+print("Weights:", model.weights)
+print("Bias:", model.bias)
