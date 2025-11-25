@@ -1,6 +1,12 @@
-# Weight Interpretation Analysis
+Detailed Feature Interpretation
 
-Higher absolute coefficient values indicate stronger influence.
-Positive weight → increases probability of class 1.
-Negative weight → decreases probability of class 1.
-Interpret coefficients in context.txt.
+This analysis evaluates feature importance using a logistic regression model
+trained on a synthetic dataset generated with make_classification.
+
+Each feature weight indicates how strongly and in what direction a feature
+influences the prediction of class 1.
+
+Positive weights → higher feature values increase likelihood of class 1.
+Negative weights → higher feature values decrease likelihood of class 1.
+
+The final interpretation is provided by analysis.py and printed in main.py.

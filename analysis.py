@@ -1,26 +1,31 @@
-
 import numpy as np
-from logistic_regression import LogisticRegressionScratch
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
 
-# Load synthetic dataset from main logic
-np.random.seed(42)
-n_samples = 500
-income = np.random.normal(50000, 15000, n_samples)
-debt = np.random.normal(15000, 5000, n_samples)
-credit_score = np.random.normal(650, 50, n_samples)
+def generate_data():
+    X, y = make_classification(
+        n_samples=500,
+        n_features=5,
+        n_informative=3,
+        n_redundant=0,
+        random_state=42
+    )
+    feature_names = [f"feature_{i+1}" for i in range(5)]
+    return X, y, feature_names
 
-X = np.column_stack([income, debt, credit_score])
-y = ((0.00004*debt - 0.00003*income - 0.002*credit_score + np.random.normal(0,0.05,n_samples)) > -0.5).astype(int)
+def analyze():
+    X, y, feature_names = generate_data()
+    model = LogisticRegression().fit(X, y)
+    weights = model.coef_[0]
 
-X = (X - X.mean(axis=0)) / X.std(axis=0)
+    interpretations = []
+    for name, w in zip(feature_names, weights):
+        direction = "increases" if w > 0 else "decreases"
+        interpretations.append(
+            f"{name}: A higher value {direction} the likelihood of class 1 (weight={w:.4f})."
+        )
+    return interpretations
 
-model = LogisticRegressionScratch(lr=0.01, n_iters=8000)
-model.fit(X, y)
-
-print("Final weights:", model.weights)
-print("Final bias:", model.bias)
-
-# Interpretation
-features = ["income", "debt", "credit_score"]
-for f, w in zip(features, model.weights):
-    print(f"Feature: {f}, Weight: {w}, Interpretation: {'positive' if w>0 else 'negative'} influence on default probability")
+if __name__ == "__main__":
+    for line in analyze():
+        print(line)
