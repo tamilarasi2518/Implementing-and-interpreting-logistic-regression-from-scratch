@@ -1,0 +1,9 @@
+# Problem Context
+
+Binary classification representing loan default:
+1 = default
+0 = paid
+
+Features (synthetic):
+feature_0–4 represent income stability, credit history signals, etc.
+Interpretation done relative to financial risk factors.

@@ -1,0 +1,6 @@
+# Weight Interpretation Analysis
+
+Higher absolute coefficient values indicate stronger influence.
+Positive weight → increases probability of class 1.
+Negative weight → decreases probability of class 1.
+Interpret coefficients in context.txt.
