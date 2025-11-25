@@ -8,6 +8,10 @@ class LogisticRegressionScratch:
     def sigmoid(self, z):
         return 1 / (1 + np.exp(-z))
 
+    def loss(self, y, y_pred):
+        eps = 1e-9
+        return -np.mean(y*np.log(y_pred+eps) + (1-y)*np.log(1-y_pred+eps))
+
     def fit(self, X, y):
         n_samples, n_features = X.shape
         self.weights = np.zeros(n_features)
@@ -23,5 +27,8 @@ class LogisticRegressionScratch:
             self.weights -= self.lr * dw
             self.bias -= self.lr * db
 
+    def predict_proba(self, X):
+        return self.sigmoid(np.dot(X, self.weights) + self.bias)
+
     def predict(self, X):
-        return (self.sigmoid(np.dot(X, self.weights) + self.bias) >= 0.5).astype(int)
+        return (self.predict_proba(X) >= 0.5).astype(int)
